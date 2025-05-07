@@ -1,0 +1,13 @@
+{
+  "name": "mern-spotify-clone-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm --prefix ./api run build && npm --prefix ./client run build",
+    "start": "npm --prefix ./api run prod"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
