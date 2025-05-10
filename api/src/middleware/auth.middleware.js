@@ -1,5 +1,6 @@
 import { clerkClient } from "@clerk/express";
 
+// Check user is login or not
 const protectRoute = async (req, res, next) => {
   try {
     const userId = req.auth.userId;
@@ -15,6 +16,7 @@ const protectRoute = async (req, res, next) => {
   }
 };
 
+// Check user is admin or not
 const requireAdmin = async (req, res, next) => {
   try {
     const userId = req.auth.userId;
