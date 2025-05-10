@@ -2,6 +2,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import Album from "../models/album.model.js";
 import Song from "../models/song.model.js";
 
+// Upload files to cloudinary
 const uploadToCloudinary = async (file) => {
   try {
     const result = await cloudinary.uploader.upload(file.tempFilePath, {
@@ -28,18 +29,11 @@ const checkAdmin = async (req, res, next) => {
 // Songs management
 const createSong = async (req, res, next) => {
   try {
-    if (!req.files || !req.files.imageFile || !req.files.audioFile) {
-      return res.status(400).json({ message: `Files required.` });
-    }
-
     const { songName, artist, duration, albumId } = req.body;
     const imageFile = req.files.imageFile;
     const audioFile = req.files.audioFile;
 
-    const songImageUrl = await uploadToCloudinary(imageFile);
-    const audioUrl = await uploadToCloudinary(audioFile);
-
-    if (!songName || !artist || !duration) {
+    if (!songName) {
       return res.status(400).json({ message: `Song name required.` });
     }
     if (!artist) {
@@ -48,7 +42,16 @@ const createSong = async (req, res, next) => {
     if (!duration) {
       return res.status(400).json({ message: `Duration required.` });
     }
+    if (!imageFile) {
+      return res.status(400).json({ message: `Image file required.` });
+    }
+    if (!audioFile) {
+      return res.status(400).json({ message: `Audio file required.` });
+    }
 
+    const songImageUrl = await uploadToCloudinary(imageFile);
+    const audioUrl = await uploadToCloudinary(audioFile);
+    
     const newSong = new Song({
       songName: songName,
       artist: artist,
@@ -57,9 +60,9 @@ const createSong = async (req, res, next) => {
       duration: duration,
       albumId: albumId || null
     });
-
+    
     await newSong.save();
-
+    
     // if song belongs to an album, update the album's songs array
     if (albumId) {
       await Album.findByIdAndUpdate(albumId, { $push: { songs: newSong._id } });
@@ -101,15 +104,28 @@ const createAlbum = async (req, res, next) => {
     const { albumName, artist, releaseYear } = req.body;
     const { imageFile } = req.files;
 
-    const imageUrl = await uploadToCloudinary(imageFile);
+    if (!albumName) {
+      return res.status(400).json({ message: `Album name required.` });
+    }
+    if (!artist) {
+      return res.status(400).json({ message: `Artist required.` });
+    }
+    if (!releaseYear) {
+      return res.status(400).json({ message: `Release year required.` });
+    }
+    if (!imageFile) {
+      return res.status(400).json({ message: `Image file required.` });
+    }
 
+    const imageUrl = await uploadToCloudinary(imageFile);
+    
     const newAlbum = new Album({
       albumName: albumName,
       artist: artist,
       albumImageUrl: imageUrl,
       releaseYear: releaseYear
     });
-
+    
     await newAlbum.save();
 
     res.status(201).json({ message: "Album created successfully." });
