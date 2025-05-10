@@ -40,6 +40,10 @@ app.use("/api/albums", albumRoutes);
 app.use("/api/songs", songRoutes);
 app.use("/api/stats", statRoutes);
 
+app.use((err, req, res, next) => {
+  res.status(500).json({ message: `Error ${err.methodName} module: ${err.message}` });
+})
+
 app.listen(PORT, async () => {
   console.log(`http://localhost:${PORT}`);
   await connectDB();

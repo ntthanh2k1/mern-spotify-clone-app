@@ -10,11 +10,12 @@ const protectRoute = async (req, res, next) => {
 
     next();
   } catch (error) {
-    res.status(500).json({ message: `Error protectRoute module: ${error.message}.` });
+    error.methodName = protectRoute.name;
+    next(error);
   }
 };
 
-const requireAdmin = async (req, res) => {
+const requireAdmin = async (req, res, next) => {
   try {
     const userId = req.auth.userId;
     const user = await clerkClient.users.getUser(userId);
@@ -26,7 +27,8 @@ const requireAdmin = async (req, res) => {
 
     next();
   } catch (error) {
-    res.status(500).json({ message: `Error requireAdmin module: ${error.message}.` });
+    error.methodName = requireAdmin.name;
+    next(error);
   }
 };
 
